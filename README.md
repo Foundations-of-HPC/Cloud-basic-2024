@@ -38,16 +38,16 @@ First weeek of January is spare time if something has beeen left behind.
 
 | DATE         | TIME  | ROOM          | LECTURE                        |
 | :----------  | :-----| :-------------| :------------------------------
-| Fri, Sep 27  | 11-13 | Aula 5C       | Introduction to Cloud          |        
+| Fri, Sep 27  | 17-19 | Aula 2A Morin | Introduction to Cloud          |        
 | Thu, Oct 03  | 17-19 | Aula 2A Morin | Cloud Architecture             |
-| Fri, Oct 04  | 11-13 | Aula 5C       | Networking                     |
+| Fri, Oct 04  | 17-19 | Aula 2A Morin | Networking                     |
 | Thu, Oct 10  | 17-19 | Aula 2A Morin | Virtualization  & Lab          |
-| Fri, Oct 11  | 11-13 | Aula 5C       | Benchmarking resource  & Lab   |
+| Fri, Oct 11  | 17-19 | Aula 2A Morin | Benchmarking resource  & Lab   |
 | Thu, Oct 24  | 17-19 | Aula 2A Morin | Cloud models & Lab             |
-| Fri, Oct 25  | 11-13 | Aula 5C       | AWS Cloud & Lab                | 
-| Fri, Oct 31  | 11-13 | Aula 5C       | Data Cloud                     |
+| Fri, Oct 25  | 17-19 | Aula 2A Morin | AWS Cloud & Lab                | 
+| Fri, Oct 31  | 17-19 | Aula 2A Morin | Data Cloud                     |
 | Thu, Nov 07  | 17-19 | Aula 2A Morin | Containers  & Lab              |
-| Fri, Nov 08  | 11-13 | Aula 5C       | Containers                     |
+| Fri, Nov 08  | 17-19 | Aula 2A Morin | Containers                     |
 | Fri, Nov 08  | 17-19 | Aula 2A Morin | Lab on Containers              |
 | Thu, Nov 14  | 17-19 | Aula 2A Morin | Introduction to k8s            |
 
