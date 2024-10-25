@@ -24,6 +24,14 @@ Computational resource to be used: ORFEO cluster see https://orfeo-doc.areascien
   - decent knwoledge of a programming language ( C and/or C++ but even Fortran is fine)
   - decent knowledge of scripting language  ( python is fine but bash awk perl are also welcome}
 
+
+#### Books
+  - Cloud Computing Bible by Barrie Sosinsky
+  - Cloud Computing by Barrie Sosinsky Wiley Publishing
+  - Cloud Computing: Concepts, Technology & Architecture by Thomas Erl (Author), Ricardo Puttini (Author), Zaigham Mahmood (Author)
+  - Linux Containers And Docker: Gain A Deeper Understanding Of Linux Containers And Docker by Lupe SproleRef 4: Linux Containers and Virtualization (a kernel perspective) by Shashank Mohan Jain
+
+
 #### CALENDAR
 
 We plan to provide 16 hours frontal lecture, 8 hours of lab/tutorials and a few more hours as seminars.
@@ -50,7 +58,9 @@ First weeek of January is spare time if something has beeen left behind.
 | Fri, Nov 08  | 17-19 | Aula 2A Morin | Containers                     |
 | Fri, Nov 08  | 17-19 | Aula 2A Morin | Lab on Containers              |
 | Thu, Nov 14  | 17-19 | Aula 2A Morin | Introduction to k8s            |
-
+| Fri, Nov 19  | 17-19 | Aula 2A Morin | extra lecure or lab            |
+| Fri, Dic 06  | 17-19 | Aula 2A Morin | extra lecure or lab            |
+| Fri, Dic 13  | 17-19 | Aula 2A Morin | extra lecure or lab            |
 
 Exame sessions of the first semester
 
