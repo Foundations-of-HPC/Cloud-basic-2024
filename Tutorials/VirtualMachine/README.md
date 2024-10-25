@@ -27,14 +27,19 @@ We create one template that we will use then to deply the cluster and to make so
 
 Create the template virtual machine which we will name "template" with 1vCPUs, 1GB of RAM and 25 GB hard disk. 
 
-You can use Ubuntu 24.04.XX LTS server (https://ubuntu.com/download/server)  (PAY ATTENTION TO YOUR ARCHITECURE arm/amd64)
+You can use Ubuntu 24.04.XX LTS server (https://ubuntu.com/download/server)  (PAY ATTENTION TO YOUR ARCHITECURE arm64/amd64)
 
 Make sure to set up the network as follows:
 
  * Attach the downloaded Ubuntu ISO to the "ISO Image".
  * Type: is Lunux
  * Version Ubuntu 24.04 LTS
-When you start the virtual machines for the first time you are prompted to instal and setup Ubuntu. 
+
+When you configure the VM you can choose the authomatic installation, in this case set a user and a password and a hostname.
+Sometimes the authomatic installation is not working in this case use the manual one as discussed below.
+
+In case of manual installation, 
+when you start the virtual machines for the first time you are prompted to instal and setup Ubuntu. 
 Follow through with the installation until you get to the “Network Commections”. 
 As the VM network protocol is NAT,  the virtual machine will be assinged to an automatic IP (internal) and it will be able to access internet for software upgrades. 
 
@@ -71,7 +76,7 @@ You can check the DHCP-assigned IP address by entering the following command:
 hostname -I
 ```
 
-You will get an output similar to this:
+You will get an output similar (may be different according to the OS of the host machine) to this:
 ```
 10.0.2.15
 ```
@@ -86,114 +91,67 @@ $ sudo apt install net-tools
 $ sudo apt install gcc make 
 ```
 
-If everything is ok, we can proceed cloning this template. We will create 3 clones (you can create more than 3 
-according to the amount of RAM and cores available in your laptop).
+If everything is ok, we can proceed cloning this template. We will create 2 clones (Master and node prototype).
 
-You must shutdown the node to clone it, using VirtualBox interface (select VM and right click) create 3 new VMs. 
+You must shutdown the node to clone it, using VirtualBox interface (select VM and right click) create 2 new VMs. 
 
 ```
 $ sudo shutdown -h now
 ```
 
 
-Right click on the name of the VM and clone it. The first clone will be the login/master node the other twos will be computing nodes.
+Right click on the name of the VM and clone it. 
+The first clone will be the login/master node the other twos will be computing nodes.
+
+## Configure the VBOx internal network.
+
+Open Tools-> Network, on the Host-only-network panel create a new one. Call it CloudBasicNet with:
+
+```
+Mask: 255.255.255.0
+Lower Bound: 192.168.56.2
+Upper Bound: 192.168.56.199
+```
+Note that the lower bound starts from x.x.x.2 and not from x.x.x.1.
 
 ## Configure the nodes
 
-Once the 2 machines has been cloned we can bootstrap the login/master node and configure it.
-Add a new network adapter on each machine: enable "Adapter 2" "Attached to" internal network and name it "clustervimnet"
+Once the 2 machines has been cloned we add a new network adapter on each machine: enable "Adapter 2" "Attached to" internal network and name it "CloudBasicNet".
 
-### Login/master node
-
-Bootstrap the VM and configure the secondary network adapter with a static IP. 
-
-In the example below the interface is enp0s8, to find your own one:
-
-```
-$ ip link show
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-    link/ether 08:00:27:2b:e5:36 brd ff:ff:ff:ff:ff:ff
-3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-    link/ether 08:00:27:6e:cf:82 brd ff:ff:ff:ff:ff:ff
-```
-
-You are interested to link 2 and 3. Link 2 is the NAT device, Link 3 is the internal network device.
-You are interested in Link 3.
-
-Now we configure the adapter. To do this we will edit the netplan file:
-
-```
-$ sudo vim /etc/netplan/50-cloud-init.yaml
-
-# This is the network config written by 'subiquity'
-network:
-  ethernets:
-    enp0s1:
-      dhcp4: true
-    enp0s8:
-     dhcp4: no
-     addresses: [192.168.0.1/24]
-  version: 2
-```
-
-and apply the configuration
-
-```
-$ sudo netplan apply
-```
-We change the hostname:
-```
-$ sudo vim /etc/hostname
-
-node01
-```
-
-
-Edit the hosts file to assign names to the cluster that should include names for each node as follows:
-
-```
-$ sudo vim /etc/hosts
-
-127.0.0.1 localhost
-192.168.0.1 master
-
-192.168.0.21 node01
-192.168.0.22 node02
-192.168.0.23 node03
-192.168.0.24 node04
-192.168.0.25 node05
-
-# The following lines are desirable for IPv6 capable hosts
-::1     ip6-localhost ip6-loopback
-fe00::0 ip6-localnet
-ff00::0 ip6-mcastprefix
-ff02::1 ip6-allnodes
-ff02::2 ip6-allrouters
-
-```
-#### Port forwarding on  master node
+### Port forwarding 
 To enable ssh from host to guest VM you need to create a port forwarding rule in VirtualBox. 
 To do this open 
 ```
 VM settings -> Network -> Advanced -> Port Forwarding 
 ```
 
-and create a forwarding rule from host to the VM: 
+create a forwarding rule from host to the Master VM: 
 * Name --> ssh 
 * Protocol --> TCP
 * HostIP --> 127.0.0.1
-* Host Port --> 2222
+* Host Port --> 3022
 * Guest Port --> 22
 
-Now you should be able to ssh to your VM. Startup the VM, then
+
+and to the Node1 VM
+create a forwarding rule from host to the Master VM: 
+* Name --> ssh 
+* Protocol --> TCP
+* HostIP --> 127.0.0.1
+* Host Port --> 4022
+* Guest Port --> 22
+
+Then you should be able to ssh to your VM. 
+
+### Master node
+
+Bootstrap the VM and ssh from a terminal of your Host Machine (if you like).
+
 
 ```
-ssh -p 2222 user01@127.0.0.1
+ssh -p 3022 user01@127.0.0.1
 ```
 
-but you will have to enter the password. 
 If you want a passwordless access you need to generate a ssh key or use an ssh key if you already have it.
 
 If you don’t have public/private key pair already, run ssh-keygen and agree to all defaults. 
@@ -202,7 +160,7 @@ This will create id_rsa (private key) and id_rsa.pub (public key) in ~/.ssh dire
 Copy host public key to your VM:
 
 ```
-scp -P 2222 ~/.ssh/id_rsa.pub user01@127.0.0.1:~
+scp -P 3022  ~/.ssh/id_rsa.pub user01@127.0.0.1:~
 ```
 
 Connect to the VM and add host public key to ~/.ssh/authorized_keys:
@@ -218,7 +176,84 @@ exit
 
 Now you should be able to ssh to the VM without password.
 
-#### DHCP and DNS on master node
+
+### Configure the  network 
+In the example below the interface is enp0s8, to find your own one:
+
+```
+$ ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:2b:e5:36 brd ff:ff:ff:ff:ff:ff
+3: enp0s9: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:6e:cf:82 brd ff:ff:ff:ff:ff:ff
+```
+
+You are interested to link 2 and 3. Link 2 is the NAT device for external connectivity, 
+Link 3 is the internal network device.
+We configure  Link 3.
+
+Now we configure the adapter, it will be the master so it will have 192.168.56.1 IP address.
+To do this we will edit the netplan file:
+
+```
+$ sudo vim /etc/netplan/50-cloud-init.yaml
+
+# This is the network config written by 'subiquity'
+network:
+  ethernets:
+    enp0s8:
+      dhcp4: true
+    enp0s9:
+     dhcp4: false
+     addresses: [192.168.56.1/24]
+  version: 2
+```
+
+check the indentation and apply the configuration
+
+```
+$ sudo netplan apply
+```
+We change the hostname:
+```
+$ sudo vim /etc/hostname
+
+master
+```
+
+
+Edit the hosts file to assign names to the cluster that should include names for each node as follows:
+
+```
+$ sudo vim /etc/hosts
+
+127.0.0.1 localhost
+127.0.1.1 master
+192.168.56.1 master
+
+192.168.56.2 node02
+192.168.56.3 node03
+192.168.56.4 node04
+192.168.56.5 node05
+192.168.56.6 node06
+192.168.56.7 node07
+192.168.56.8 node08
+192.168.56.9 node09
+192.168.56.10 node10
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+```
+
+
+#### DNS on master node
 
 Then we install a DNSMASQ server to dynamically assign the IP and hostname to the other nodes on the internal interface and create a cluster [1].
 
@@ -233,66 +268,33 @@ To find and configuration file for Dnsmasq, navigate to /etc/dnsmasq.conf. Edit 
 ```
 $ sudo vim /etc/dnsmasq.conf
 
-port=53
+
 bogus-priv
-strict-order
-interface=enp0s9
-listen-address=::1,127.0.0.1,192.168.0.1
 bind-interfaces
+cache-size=1000
+resolv-file=/etc/resolv.dnsmasq
+listen-address=127.0.0.1, 192.168.56.1
 log-queries
-log-dhcp
-dhcp-range=192.168.0.22,192.168.0.28,255.255.255.0,12h
-dhcp-option=option:dns-server,192.168.0.1
-dhcp-option=3
 
 ```
 
 When done with editing the file, close it and modify the resolv.conf file:
 
 ```
-sudo ln -fs /run/systemd/resolve/resolv.conf /etc/resolv.conf
-```
+sudo unlink /etc/resolv.conf
 
-Then modify the network configuration (note the nameservers section):
+sudo vim /etc/resolv.conf
 
-```
-$ sudo vim /etc/netplan/50-cloud-init.yaml
-
-network:
-    ethernets:
-        enp0s8:
-            dhcp4: true
-        enp0s9:
-            dhcp4: false
-            addresses: [192.168.0.1/24]
-            nameservers:
-                addresses: [192.168.0.1]
-    version: 2
-```
-
-
-Save this file and modify the /etc/default/dnsmasq: uncomment the following lines:
+nameserver 127.0.0.1
+options edns0 trust-ad
+search .
 
 ```
-$ x
+Configure the resolve file for external access
 
-# If the resolvconf package is installed, dnsmasq will use its output
-# rather than the contents of /etc/resolv.conf to find upstream
-# nameservers. Uncommenting this line inhibits this behaviour.
-# Note that including a "resolv-file=<filename>" line in
-# /etc/dnsmasq.conf is not enough to override resolvconf if it is
-# installed: the line below must be uncommented.
-IGNORE_RESOLVCONF=yes
-
-# If the resolvconf package is installed, dnsmasq will tell resolvconf
-# to use dnsmasq under 127.0.0.1 as the system's default resolver.
-# Uncommenting this line inhibits this behaviour.
-DNSMASQ_EXCEPT="lo"
 ```
+$ sudo ln -s  /run/systemd/resolve/resolv.conf /etc/resolv.dnsmasq
 
-
-Now you can restart Dnsmasq to apply the changes. 
-```
 $ sudo systemctl restart dnsmasq systemd-resolved
 
 $ sudo root@master:~# systemctl status dnsmasq
@@ -356,11 +358,21 @@ Check if it is working
 $ host node02
 
 node02 has address 192.168.0.22
+
+$ host 192.168.56.4
+4.56.168.192.in-addr.arpa domain name pointer node04.
 ```
 
-Reboot  the VM. 
+Enable the service and Rreboot  the VM:
 
-Afther bootstrap may happen the dnsmasq service start before the interfaces, just restart the service:
+```
+$ sudo systemctl enable dnsmasq
+Synchronizing state of dnsmasq.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable dnsmasq
+
+$ sudo reboot
+```
+Afther bootstrap may happen the dnsmasq service start before the interfaces, just restart the service (this is a known preoblem for ubuntu):
 ```
 $ sudo systemctl restart dnsmasq systemd-resolved
 ```
@@ -381,7 +393,7 @@ Modify the NFS config file:
 ```
 $ sudo vim /etc/exports
 
-/shared/  192.168.0.0/255.255.255.0(rw,sync,no_root_squash,no_subtree_check)
+/shared/  192.168.56.0/255.255.255.0(rw,sync,no_root_squash,no_subtree_check)
 
 ```
 Restart the server
@@ -390,8 +402,13 @@ Restart the server
 $ sudo systemctl enable nfs-kernel-server
 $ sudo systemctl restart nfs-kernel-server
 ```
+prepare some directories to share:
+```
+$ sudo mkdir /shared/data /shared/home
+$ sudo chmod 777  /shared/data /shared/home
+```
 
-### Other nodes
+### The nodes
 Bootstrap the VM  node01 and configure the secondary network adapter with a dynamic IP (this should be standard configuration and nothing should me modified, anyway please check with the "ip link show" command to check the name of the adapters). 
 
 To do this we will edit the netplan file:
@@ -410,11 +427,10 @@ network:
      dhcp4: true
      dhcp-identifier: mac
      nameservers:
-          addresses: [192.168.0.1]
+          addresses: [192.168.56.1]
   version: 2
 ```
-
-and apply the configuration
+check the indentation and apply the configuration
 
 ```
 $ sudo netplan apply
@@ -429,7 +445,12 @@ $ sudo vim /etc/hostname
 Set the proper dns server (assigned with dhcp):
 
 ```
-$ sudo ln -fs /run/systemd/resolve/resolv.conf /etc/resolv.conf
+$ sudo unlink   /etc/resolv.conf
+
+$ sudo vim /etc/resolv.conf
+
+nameserver 192.168.56.1
+search .
 ```
 
 Reboot the machine.
@@ -470,33 +491,262 @@ exit
 #### Configure the shared filesystem
 
 ```
-$ sudo apt install nfs-common
+$ sudo apt install nfs-common -y
 $ sudo mkdir /shared
 ```
 
 Mount the shared directory adn test it
 ```
-$ sudo mount 192.168.0.1:/shared  /shared
+$ sudo mount 192.168.56.1:/shared  /shared
+
+$ df -h
+Filesystem            Size  Used Avail Use% Mounted on
+tmpfs                 196M 1016K  195M   1% /run
+efivarfs              256K  6.5K  250K   3% /sys/firmware/efi/efivars
+/dev/sda2              24G  2.5G   20G  11% /
+tmpfs                 978M     0  978M   0% /dev/shm
+tmpfs                 5.0M     0  5.0M   0% /run/lock
+/dev/sda1             1.1G  6.4M  1.1G   1% /boot/efi
+tmpfs                 196M   12K  196M   1% /run/user/1000
+192.168.56.1:/shared   24G  2.5G   20G  11% /shared
+```
+
+Check that you have R/W access:
+```
 $ touch /shared/pippo
 ```
 If everything will be ok you will see the "pippo" file in all the nodes.
+Unmount the mount pont:
+```
+$ sudo umount /shared/
+```
 
 To automatically mount 
 ```
-root@node0x:~# apt -y install autofs
-root@node01:~# vi /etc/auto.master
+$ sudo apt -y install autofs
+$ sudo  vim /etc/auto.master
 # add to last line
- /-    /etc/auto.mount
+/shared    /etc/auto.shared
 ```
 then
 
 ```
-root@node01:~# vi /etc/auto.mount
+$ sudo vim /etc/auto.mount
 # create new : [mount point] [option] [location]
- /shared   -fstype=nfs,rw  192.168.0.1:/shared     
+data    192.168.56.1:/shared   
 
-root@node01:~# systemctl restart autofs
+
+$ sudo  systemctl restart autofs
 ```
+
+## Create a load balancing service
+
+In this tutorial, we are going to create a load balancing service on VMs.
+
+* Only the master VM is capable of connecting to the internet and able to connect with each other privately (we expose only one machine with no data)
+* Nodes hosts the service
+
+
+## Install the load balancer on Master
+
+To enable http access from host to guest VM you need to create a port forwarding rule in VirtualBox. 
+To do this open 
+```
+VM settings -> Network -> Advanced -> Port Forwarding 
+```
+
+create a forwarding rule from host to the Master VM: 
+* Name --> ssh 
+* Protocol --> TCP
+* HostIP --> 127.0.0.1
+* Host Port --> 8080
+* Guest Port --> 80
+
+
+### Configuring nginx as a load balancer
+
+```
+$ sudo apt-get -y install nginx
+$ sudo systemctl start nginx.service
+$ sudo systemctl status nginx.service
+```
+Check from your browser that you can connect to http://localhost:8080...if ok nginx is running.
+
+When nginx is installed and tested, start to configure it for load balancing. In essence, all you need to do is set up Nginx with instructions on which type of connections to listen to and where to redirect them. 
+
+Stop the service and disable the default configuration
+```
+$ sudo systemctl stop nginx.service
+$ sudo  rm /etc/nginx/sites-enabled/default
+```
+
+Create a new configuration file using whichever text editor you prefer. 
+
+NOTICE: Check the IP addresses of the nodes that you create, new nodes will have new ip addresses. The internal DHCP server is not going to reuse the old ones!!!!
+
+```
+sudo vim  /etc/nginx/conf.d/load-balancer.conf
+
+# Define which servers to include in the load balancing scheme. 
+# It's best to use the servers' private IPs for better performance and security.
+# You can find the private IPs at your UpCloud control panel Network section.
+   upstream backend {
+      server 192.168.56.7:5001; 
+      server 192.168.56.8:5001;
+      server 19.168.56.9:5001;
+   }
+
+   # This server accepts all traffic to port 80 and passes it to the upstream. 
+   # Notice that the upstream name and the proxy_pass need to match.
+
+   server {
+      listen 80; 
+
+      location / {
+          proxy_pass http://backend;
+      }
+   }
+```
+### Configure the node template
+
+Install python Virtual Env,
+```
+sudo apt install python3.12-venv
+```
+
+As user create a virtual enviroment to install Flask:
+
+```
+user01@template:~$ python3 -m venv env
+user01@template:~$ source env/bin/activate
+(env) user01@template:~$ pip install Flask
+...
+```
+
+Test with a very simple Flask app
+
+```
+(env) user01@template:~$ mkdir app
+(env) user01@template:~$ vim app/app01.py
+
+from flask import Flask
+
+app = Flask(__name__)
+counter = 0  # Global counter for requests
+
+@app.route('/', methods=['POST'])
+def increment_counter():
+    global counter
+    counter += 1
+    return f"Server has processed {counter} requests!"
+```
+
+Run the app (NOTE THAT THE HOST SHOULD BE THE NODE HOST IP)
+
+```
+(env) user01@template:~$ flask --app app/app01.py run --port 5001 --host 192.168.56.7
+ * Serving Flask app 'app/app01.py'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://192.168.56.7:5001
+Press CTRL+C to quit
+```
+
+Now you can test the configuration, from you host machine:
+
+```
+$ curl -X POST http://localhost:8080
+```
+
+Question: why is it working? Are you sure it is really working?
+
+If it is working you can stop the machine and clone it 3 times.
+
+## Test the configuration
+
+Bootstrap the 3 nodes. And in each one of them activate the virtual env and run the application:
+
+```
+user01@template:~$ source env/bin/activate
+(env) user01@template:~$ flask --app app/app01.py run --port 5001 --host 192.168.56.X
+```
+
+NOTE: change the IP address to the node IP.
+
+Now you can test the configuration, from you host machine:
+
+```
+$ curl -X POST http://localhost:8080
+```
+
+QUESTION: is it acting as expected? If not why?
+
+### External caching service
+
+Redis is an in-memory data store that can be used as a cache backend. By using Flask and Redis together, you can cache the results of expensive computations and serve them quickly to users.
+
+Select one of the nodes and install redis service:
+```
+$ sudo apt-get install redis-server
+```
+
+configure the server to bind to the proper IP address of the node
+
+```
+vim /etc/redis/redis.conf
+
+...
+bind 192.168.56.9 127.0.0.1
+...
+```
+Restart the redis service
+
+```
+$ sudo systemctl restart redis
+```
+
+Now we can use a redis enabled version of the program:
+
+```
+from flask import Flask
+import redis
+import socket
+
+app = Flask(__name__)
+
+# Initialize Redis client
+r = redis.Redis(host='node09', port=6379, db=0)
+
+# Set initial value if not set
+if not r.exists("counter"):
+    r.set("counter", 0)
+
+def get_ip():
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    return ip_address
+
+@app.route('/', methods=['POST'])
+def increment_counter():
+    # Increment the counter in Redis
+    new_counter = r.incr("counter")
+    # Get the IP address of the current node
+    node_ip = get_ip()
+    return f"Server (IP: {node_ip}) has processed {new_counter} requests!"
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5001)
+```
+
+Now you can test again, from your Host machine:
+
+```
+$ curl -X POST http://localhost:8080
+```
+
+QUESTION: is it acting as expected? If not why?
+
 
 
 ## References
