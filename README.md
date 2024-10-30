@@ -53,14 +53,12 @@ First weeek of January is spare time if something has beeen left behind.
 | Fri, Oct 11  | 17-19 | Aula 2A Morin | Benchmarking resource  & Lab   |
 | Thu, Oct 24  | 17-19 | Aula 2A Morin | Cloud models & Lab             |
 | Fri, Oct 25  | 17-19 | Aula 2A Morin | AWS Cloud & Lab                | 
-| Fri, Oct 31  | 17-19 | Aula 2A Morin | Data Cloud                     |
 | Thu, Nov 07  | 17-19 | Aula 2A Morin | Containers  & Lab              |
-| Fri, Nov 08  | 17-19 | Aula 2A Morin | Containers                     |
-| Fri, Nov 08  | 17-19 | Aula 2A Morin | Lab on Containers              |
-| Thu, Nov 14  | 17-19 | Aula 2A Morin | Introduction to k8s            |
-| Fri, Nov 19  | 17-19 | Aula 2A Morin | extra lecure or lab            |
-| Fri, Dic 06  | 17-19 | Aula 2A Morin | extra lecure or lab            |
-| Fri, Dic 13  | 17-19 | Aula 2A Morin | extra lecure or lab            |
+| Fri, Nov 08  | 11-13 | Aula 5C (Edificio H2bis) | Containers                     |
+| Fri, Nov 08  | 17-19 | Aula 2A Morin | Introduction to k8s              |
+| Thu, Nov 14  | 17-19 | Aula 2A Morin |  Containers          |
+| Fri, Dic 06  | 17-19 | Aula 2A Morin | Data Cloud.                    |
+| Fri, Dic 13  | 17-19 | Aula 2A Morin | Final Considerations           |
 
 Exame sessions of the first semester
 
