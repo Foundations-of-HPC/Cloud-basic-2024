@@ -64,8 +64,8 @@ Exame sessions of the first semester
 
 | DATE         | TIME   | LOCATION            |
 | :----------  | :----  | :-----------------
-|   |  | Osservatorio Astronomico di Trieste, via Bazzoni 2 |
-|   |  | Osservatorio Astronomico di Trieste, via Bazzoni 2 |
+| -  | - | Osservatorio Astronomico di Trieste, via Bazzoni 2 |
+| -  | - | Osservatorio Astronomico di Trieste, via Bazzoni 2 |
    
 
 
