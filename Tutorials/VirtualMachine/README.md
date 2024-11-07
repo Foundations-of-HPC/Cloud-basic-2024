@@ -556,7 +556,7 @@ VM settings -> Network -> Advanced -> Port Forwarding
 ```
 
 create a forwarding rule from host to the Master VM: 
-* Name --> ssh 
+* Name --> http 
 * Protocol --> TCP
 * HostIP --> 127.0.0.1
 * Host Port --> 8080
@@ -593,7 +593,7 @@ sudo vim  /etc/nginx/conf.d/load-balancer.conf
    upstream backend {
       server 192.168.56.7:5001; 
       server 192.168.56.8:5001;
-      server 19.168.56.9:5001;
+      server 192.168.56.9:5001;
    }
 
    # This server accepts all traffic to port 80 and passes it to the upstream. 
