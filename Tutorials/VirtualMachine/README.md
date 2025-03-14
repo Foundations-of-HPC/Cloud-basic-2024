@@ -278,6 +278,23 @@ log-queries
 
 ```
 
+NOTE THAT IF YOU ARE USING LINUX USE the following configutration 
+
+```
+$ sudo vim /etc/dnsmasq.conf
+
+
+bogus-priv
+bind-interfaces
+cache-size=1000
+resolv-file=/etc/resolv.dnsmasq
+listen-address=127.0.0.1, 192.168.56.1
+log-queries
+dhcp-range=192.168.56.2,192.168.56.10,12h
+
+```
+
+
 When done with editing the file, close it and modify the resolv.conf file:
 
 ```
