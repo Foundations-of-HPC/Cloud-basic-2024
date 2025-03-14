@@ -359,6 +359,7 @@ Sep 25 10:07:51 master dnsmasq-dhcp[2777]: DHCP, IP range 192.168.0.21 -- 192.16
 Sep 25 10:07:51 master dnsmasq-dhcp[2777]: DHCP, sockets bound exclusively to interface enp0s9
 Sep 25 10:07:51 master dnsmasq[2777]: reading /etc/resolv.conf
 Sep 25 10:07:51 master dnsmasq[2777]: ignoring nameserver 192.168.0.1 - local interface
+Sep 25 10:07:51 master dnsmasq[2777]: ignoring nameserver 127.0.0.1 - local interface
 Sep 25 10:07:51 master dnsmasq[2777]: using nameserver 10.0.2.3#53
 Sep 25 10:07:51 master dnsmasq[2777]: using nameserver fd00::3#53
 Sep 25 10:07:51 master dnsmasq[2777]: read /etc/hosts - 14 names
@@ -373,8 +374,8 @@ Check if it is working
 
 ```
 $ host node02
-
 node02 has address 192.168.0.22
+Host node2 not found: 2(SERVFAIL)
 
 $ host 192.168.56.4
 4.56.168.192.in-addr.arpa domain name pointer node04.
